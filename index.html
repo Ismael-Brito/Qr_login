@@ -62,33 +62,34 @@ detectarRede();
 Abrindo Resultado...
 </body>
 </html> -->
-
 <!DOCTYPE html>
 
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Conectando...</title>
 
 <script>
 async function redirecionar(){
 
     const query = window.location.search;
+    console.log(query)
 
     if(!query){
         document.body.innerHTML = "QR inválido";
         return;
     }
 
-    const interno = "http://192.168.2.249/";
-    const externo = "http://168.196.212.178/";
+    const interno = "http://192.168.2.249:8080/";
+    const externo = "http://168.196.212.178:8080/";
 
     let dentro = false;
 
     try{
         await Promise.race([
             fetch(interno,{mode:"no-cors"}),
-            new Promise((_,rej)=>setTimeout(rej,1200))
+            new Promise((_,rej)=>setTimeout(rej,1500))
         ]);
         dentro = true;
     }catch(e){
@@ -115,3 +116,4 @@ redirecionar();
 Conectando ao sistema...
 </body>
 </html>
+
