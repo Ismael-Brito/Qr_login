@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Aguarde...</title>
+<script>
+
+function isPrivateIP(ip){
+return ip.startsWith("10.") ||
+ip.startsWith("192.168.") ||
+/^172.(1[6-9]|2[0-9]|3[0-1])./.test(ip);
+}
+
+async function detectarRede(){
+
+```
+// pega TODOS parâmetros 
+const queryString = window.location.search;
+
+if(!queryString){
+    document.body.innerHTML = "QR inválido";
+    return;
+}
+
+let temInternet = true;
+
+try{ await fetch("https://api.ipify.org?format=json",{cache:"no-store"}); }catch(e){ temInternet = false; }
+
+// try{
+//     const r = await fetch("https://api.ipify.org?format=json",{timeout:2000});
+//     const j = await r.json();
+//     ipPublico = j.ip;
+// }catch(e){
+//     // sem internet → rede interna
+// }
+
+let destino;
+
+if(!temInternet){
+    // rede interna (sem internet)
+    destino = "http://192.168.2.249/loginAtendimento.action" + queryString;
+    // https://192.168.2.249/primeiroAcesso.action?t=" + token;
+}else{
+    // rede externa
+    destino = "http://168.196.212.178/loginAtendimento.action" + queryString;
+    // https://SEU_IP_EXTERNO/primeiroAcesso.action?t=" + token;
+}
+
+window.location.replace(destino);
+```
+
+}
+
+detectarRede();
+
+</script>
+</head>
+<body style="font-family:Arial;text-align:center;margin-top:40px">
+Abrindo Resultado...
+</body>
+</html>
