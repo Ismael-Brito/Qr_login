@@ -71,38 +71,21 @@ Abrindo Resultado...
 <title>Conectando...</title>
 
 <script>
-function testarInterno(timeout=1500){
-    return new Promise((resolve)=>{
+function testarInterno(url){
+        try {
+    const response = await fetch(url, { method: "GET" });
 
-        const img = new Image();
-        let finalizado = false;
+    if (response.status === 200) {
+      console.log("✅ Site online (200)");
+        return true;
+    } else {
+      console.log("⚠️ Status:", response.status);
+        return false;
+    }
 
-        const timer = setTimeout(()=>{
-            if(!finalizado){
-                finalizado = true;
-                resolve(false);
-            }
-        }, timeout);
-
-        img.onload = ()=>{
-            if(!finalizado){
-                finalizado = true;
-                clearTimeout(timer);
-                resolve(true);
-            }
-        };
-
-        img.onerror = ()=>{
-            if(!finalizado){
-                finalizado = true;
-                clearTimeout(timer);
-                resolve(false);
-            }
-        };
-
-        // tenta acessar algo do servidor interno
-        img.src = "http://192.168.2.249:8080/WhebWS";
-    });
+  } catch (err) {
+    console.log("❌ Site offline ou bloqueado por CORS");
+  }
 }
 
 async function redirecionar(){
@@ -117,7 +100,7 @@ async function redirecionar(){
     const interno = "http://192.168.2.249:8080/";
     const externo = "http://168.196.212.178:8080/";
 
-    const dentro = await testarInterno();
+    const dentro = await testarInterno("http://192.168.2.249:8080/WhebWS/");
 
     let destino;
 
@@ -136,7 +119,7 @@ redirecionar();
 </head>
 
 <body style="font-family:Arial;text-align:center;margin-top:40px">
-Conectando ao sistema...
+Garregando Resultado...
 </body>
 </html>
 
