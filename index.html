@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 
 <html>
 <head>
@@ -56,7 +56,62 @@ detectarRede();
 
 </script>
 </head>
+
+
 <body style="font-family:Arial;text-align:center;margin-top:40px">
 Abrindo Resultado...
+</body>
+</html> -->
+
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Conectando...</title>
+
+<script>
+async function redirecionar(){
+
+    const query = window.location.search;
+
+    if(!query){
+        document.body.innerHTML = "QR inválido";
+        return;
+    }
+
+    const interno = "http://192.168.2.249/";
+    const externo = "https://168.196.212.178/";
+
+    let dentro = false;
+
+    try{
+        await Promise.race([
+            fetch(interno,{mode:"no-cors"}),
+            new Promise((_,rej)=>setTimeout(rej,1200))
+        ]);
+        dentro = true;
+    }catch(e){
+        dentro = false;
+    }
+
+    let destino;
+
+    if(dentro){
+        destino = interno + "loginAtendimento.action" + query;
+    }else{
+        destino = externo + "loginAtendimento.action" + query;
+    }
+
+    window.location.replace(destino);
+}
+
+redirecionar();
+</script>
+
+</head>
+
+<body style="font-family:Arial;text-align:center;margin-top:40px">
+Conectando ao sistema...
 </body>
 </html>
