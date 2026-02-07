@@ -71,10 +71,43 @@ Abrindo Resultado...
 <title>Conectando...</title>
 
 <script>
+function testarInterno(timeout=1500){
+    return new Promise((resolve)=>{
+
+        const img = new Image();
+        let finalizado = false;
+
+        const timer = setTimeout(()=>{
+            if(!finalizado){
+                finalizado = true;
+                resolve(false);
+            }
+        }, timeout);
+
+        img.onload = ()=>{
+            if(!finalizado){
+                finalizado = true;
+                clearTimeout(timer);
+                resolve(true);
+            }
+        };
+
+        img.onerror = ()=>{
+            if(!finalizado){
+                finalizado = true;
+                clearTimeout(timer);
+                resolve(false);
+            }
+        };
+
+        // tenta acessar algo do servidor interno
+        img.src = "http://192.168.2.249:8080/WhebWS";
+    });
+}
+
 async function redirecionar(){
 
     const query = window.location.search;
-    console.log(query)
 
     if(!query){
         document.body.innerHTML = "QR inválido";
@@ -84,17 +117,7 @@ async function redirecionar(){
     const interno = "http://192.168.2.249:8080/";
     const externo = "http://168.196.212.178:8080/";
 
-    let dentro = false;
-
-    try{
-        await Promise.race([
-            fetch(interno,{mode:"no-cors"}),
-            new Promise((_,rej)=>setTimeout(rej,1500))
-        ]);
-        dentro = true;
-    }catch(e){
-        dentro = false;
-    }
+    const dentro = await testarInterno();
 
     let destino;
 
