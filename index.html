@@ -1,125 +1,90 @@
-<!-- <!DOCTYPE html>
-
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Aguarde...</title>
-<script>
-
-function isPrivateIP(ip){
-return ip.startsWith("10.") ||
-ip.startsWith("192.168.") ||
-/^172.(1[6-9]|2[0-9]|3[0-1])./.test(ip);
-}
-
-async function detectarRede(){
-
-```
-// pega TODOS parâmetros 
-const queryString = window.location.search;
-
-if(!queryString){
-    document.body.innerHTML = "QR inválido";
-    return;
-}
-
-let temInternet = true;
-
-try{ await fetch("https://api.ipify.org?format=json",{cache:"no-store"}); }catch(e){ temInternet = false; }
-
-// try{
-//     const r = await fetch("https://api.ipify.org?format=json",{timeout:2000});
-//     const j = await r.json();
-//     ipPublico = j.ip;
-// }catch(e){
-//     // sem internet → rede interna
-// }
-
-let destino;
-
-if(!temInternet){
-    // rede interna (sem internet)
-    destino = "http://192.168.2.249/loginAtendimento.action" + queryString;
-    // https://192.168.2.249/primeiroAcesso.action?t=" + token;
-}else{
-    // rede externa
-    destino = "http://168.196.212.178/loginAtendimento.action" + queryString;
-    // https://SEU_IP_EXTERNO/primeiroAcesso.action?t=" + token;
-}
-
-window.location.replace(destino);
-```
-
-}
-
-detectarRede();
-
-</script>
-</head>
-
-
-<body style="font-family:Arial;text-align:center;margin-top:40px">
-Abrindo Resultado...
-</body>
-</html> -->
 <!DOCTYPE html>
-
 <html>
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Conectando...</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conectando...</title>
 
-<script>
-function testarInterno(url){
-        try {
-    const response = await fetch(url, { method: "GET" });
+  <script>
 
-    if (response.status === 200) {
-      console.log("✅ Site online (200)");
-        return true;
-    } else {
-      console.log("⚠️ Status:", response.status);
-        return false;
-    }
+    async function redirecionar() {
 
-  } catch (err) {
-    console.log("❌ Site offline ou bloqueado por CORS");
-  }
-}
+      const query = window.location.search;
 
-async function redirecionar(){
-
-    const query = window.location.search;
-
-    if(!query){
+      if (!query) {
         document.body.innerHTML = "QR inválido";
         return;
+      }
+
+      const urls = [
+        "http://168.196.212.178:8080/loginAtendimento.action" + query,
+        "http://192.168.2.249:8080/loginAtendimento.action" + query
+      ];
+
+      const destino = await tentarUrls(urls, 2500);
+
+      if (destino) {
+        document.body.innerHTML = "Conectando ao servidor...";
+        window.location.href = destino;
+      } else {
+        document.body.innerHTML = "Nenhum servidor disponível";
+      }
     }
 
-    const interno = "http://192.168.2.249:8080/";
-    const externo = "http://168.196.212.178:8080/";
 
-    const dentro = await testarInterno("http://192.168.2.249:8080/WhebWS/");
+    // testa se respondeu algo
+    function testarUrl(url, timeout) {
+      return new Promise(resolve => {
 
-    let destino;
+        const controller = new AbortController();
 
-    if(dentro){
-        destino = interno + "loginAtendimento.action" + query;
-    }else{
-        destino = externo + "loginAtendimento.action" + query;
+        const timer = setTimeout(() => {
+          controller.abort();
+          resolve(false);
+        }, timeout);
+
+        fetch(url, {
+          method: "GET",
+          mode: "no-cors",
+          signal: controller.signal
+        })
+          .then(() => {
+            clearTimeout(timer);
+            resolve(true);
+          })
+          .catch(() => {
+            clearTimeout(timer);
+            resolve(false);
+          });
+      });
     }
 
-    window.location.replace(destino);
-}
 
-redirecionar();
-</script>
+    // tenta na ordem
+    async function tentarUrls(urls, timeout) {
 
+      for (const url of urls) {
+        const ok = await testarUrl(url, timeout);
+
+        if (ok) {
+          console.log("Funcionou:", url);
+          return url;
+        }
+
+        console.log("Falhou:", url);
+      }
+
+      return null;
+    }
+
+    redirecionar();
+
+  </script>
 </head>
 
 <body style="font-family:Arial;text-align:center;margin-top:40px">
-Garregando Resultado...
+  Carregando Resultado...
 </body>
-</html>
 
+</html>
