@@ -19,8 +19,10 @@
 
       const isPrivate = host => /^(10\.|192\.168\.)/.test(host);
       const urls = [
-        "http://168.196.212.178:8080/loginAtendimento.action" + query,
-        "http://192.168.2.249:8080/loginAtendimento.action" + query
+        "http://168.196.212.178:8080/indexLaboratorio.jsp",
+        "http://192.168.2.249:8080/indexLaboratorio.jsp"
+        // "http://168.196.212.178:8080/loginAtendimento.action" + query,
+        // "http://192.168.2.249:8080/loginAtendimento.action" + query
       ].filter(u => {
         try {
           return !isPrivate(new URL(u).hostname) || location.hostname.match(/^192\.168\./);
