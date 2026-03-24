@@ -30,7 +30,7 @@
       });
 
       const destino = await tentarUrls(urls, 2500);
-
+      console.log(destino);
       if (destino) {
         document.body.innerHTML = "Conectando ao servidor...";
         window.location.href = destino;
