@@ -28,7 +28,7 @@
           return !isPrivate(new URL(u).hostname) || location.hostname.match(/^192\.168\./);
         } catch { return true; }
       });
-      console.log(urls)
+      
       const destino = await tentarUrls(urls, 2500);
       console.log(destino);
       if (destino) {
@@ -42,30 +42,32 @@
 
     // testa se respondeu algo
     function testarUrl(url, timeout) {
-      return new Promise(resolve => {
+  return new Promise(resolve => {
+    const controller = new AbortController();
 
-        const controller = new AbortController();
+    const timer = setTimeout(() => {
+      controller.abort();
+      resolve(false);
+    }, timeout);
 
-        const timer = setTimeout(() => {
-          controller.abort();
-          resolve(false);
-        }, timeout);
+    fetch(url, {
+      method: "GET",
+      cache: "no-store",
+      signal: controller.signal
+    })
+      .then(response => {
+        clearTimeout(timer);
 
-        fetch(url, {
-          method: "GET",
-          mode: "no-cors",
-          signal: controller.signal
-        })
-          .then(() => {
-            clearTimeout(timer);
-            resolve(true);
-          })
-          .catch(() => {
-            clearTimeout(timer);
-            resolve(false);
-          });
+        // Só considera sucesso se realmente respondeu OK
+        resolve(response.ok || response.type === "opaque");
+      })
+      .catch(err => {
+        clearTimeout(timer);
+        console.log("Erro em", url, err);
+        resolve(false);
       });
-    }
+  });
+}
 
 
     // tenta na ordem
